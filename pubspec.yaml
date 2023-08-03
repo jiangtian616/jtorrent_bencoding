@@ -1,0 +1,14 @@
+name: jtorrent_bencoding
+description: Bencoding implementation for BitTorrent protocol in pure Dart
+version: 1.0.0
+repository: https://github.com/jiangtian616/jtorrent_bencoding
+issue_tracker : https://github.com/jiangtian616/jtorrent_bencoding/issues
+publish_to: https://pub.dev/
+
+environment:
+  sdk: ^3.0.0
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0
+  collection: ^1.14.0
