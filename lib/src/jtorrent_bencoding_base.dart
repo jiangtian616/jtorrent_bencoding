@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:jtorrent_bencoding/src/jtorrent_bdecoding_exception.dart';
+import '../jtorrent_bencoding.dart';
 
-import 'jtorrent_bencoding_exception.dart';
+/// http://bittorrent.org/beps/bep_0003.html
 
 /// Encode num/String/bool/List/Map to Uint8List
 Uint8List bEncode(dynamic data) {
@@ -135,17 +135,16 @@ class _BDecoder {
     return _decodeIntegerFromPosition(startPosition, endPosition);
   }
 
-  String _decodeString() {
+  Uint8List _decodeString() {
     int lengthStartPosition = _position;
     int lengthEndPosition = _findNextChar(colonChar);
     int length = _decodeIntegerFromPosition(lengthStartPosition, lengthEndPosition);
 
     int strStartPosition = lengthEndPosition + 1;
-    int strEndPosition = strStartPosition + length - 1;
+    int strEndPosition = strStartPosition + length;
 
-    _position = strEndPosition + 1;
-
-    return utf8.decode(_data.sublist(strStartPosition, strEndPosition + 1));
+    _position = strEndPosition;
+    return _data.sublist(strStartPosition, strEndPosition);
   }
 
   List _decodeList() {
@@ -165,8 +164,14 @@ class _BDecoder {
 
     Map<String, dynamic> map = {};
     while (_data[_position] != eChar) {
-      String key = _decodeString();
-      map[key] = decode();
+      Uint8List key = _decodeString();
+      String keyString;
+      try {
+        keyString = utf8.decode(key);
+      } catch (e) {
+        keyString = String.fromCharCodes(key);
+      }
+      map[keyString] = decode();
     }
 
     _position++;

@@ -67,8 +67,8 @@ void main() {
 
   group('Tests Decoding', () {
     test('Test integer 666', () {
+      assert(bDecode(Utf8Codec().encoder.convert('i666e')) == 666);
     });
-    assert(bDecode(Utf8Codec().encoder.convert('i666e')) == 666);
 
     test('Test integer -666', () {
       assert(bDecode(Utf8Codec().encoder.convert('i-666e')) == -666);
@@ -83,21 +83,30 @@ void main() {
     });
 
     test('Test string JTorrent', () {
-      assert(bDecode(Utf8Codec().encoder.convert('8:JTorrent')) == 'JTorrent');
+      assert(ListEquality().equals(
+        bDecode(Utf8Codec().encoder.convert('8:JTorrent')),
+        'JTorrent'.codeUnits,
+      ));
     });
 
     test('Test string 127.0.0.1', () {
-      assert(bDecode(Utf8Codec().encoder.convert('9:127.0.0.1')) == '127.0.0.1');
+      assert(ListEquality().equals(
+        bDecode(Utf8Codec().encoder.convert('9:127.0.0.1')),
+        '127.0.0.1'.codeUnits,
+      ));
     });
 
     test('Test string localhost:80', () {
-      assert(bDecode(Utf8Codec().encoder.convert('12:localhost:80')) == 'localhost:80');
+      assert(ListEquality().equals(
+        bDecode(Utf8Codec().encoder.convert('12:localhost:80')),
+        'localhost:80'.codeUnits,
+      ));
     });
 
     test('Test list', () {
-      assert(ListEquality().equals(
+      assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666ee')),
-        ['JTorrent', 666],
+        ['JTorrent'.codeUnits, 666],
       ));
     });
 
@@ -105,9 +114,9 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666el8:JTorrenti666eee')),
         [
-          'JTorrent',
+          'JTorrent'.codeUnits,
           666,
-          ['JTorrent', 666],
+          ['JTorrent'.codeUnits, 666],
         ],
       ));
     });
@@ -137,11 +146,11 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('d5:2name9:2JTorrent4:name8:JTorrent5:piecei5e4:listld4:name8:JTorrenteee')),
         {
-          '2name': '2JTorrent',
-          'name': 'JTorrent',
+          '2name': '2JTorrent'.codeUnits,
+          'name': 'JTorrent'.codeUnits,
           'piece': 5,
           'list': [
-            {'name': 'JTorrent'}
+            {'name': 'JTorrent'.codeUnits}
           ]
         },
       ));
@@ -152,7 +161,7 @@ void main() {
         bDecode(Utf8Codec().encoder.convert('li666ed4:name8:JTorrentee')),
         [
           666,
-          {'name': 'JTorrent'}
+          {'name': 'JTorrent'.codeUnits}
         ],
       ));
     });
