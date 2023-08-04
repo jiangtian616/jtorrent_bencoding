@@ -36,14 +36,15 @@ class _BEncoder {
     if (data == null) {
       return Uint8List.fromList([]);
     }
-    if (data is Uint8List) {
-      return data;
-    }
+
     if (data is int) {
       return _encodeInteger(data);
     }
     if (data is String) {
       return _encodeString(data);
+    }
+    if (data is Uint8List) {
+      return _encodeStringInUint8List(data);
     }
     if (data is bool) {
       return _encodeInteger(data ? 1 : 0);
@@ -64,6 +65,13 @@ class _BEncoder {
 
   Uint8List _encodeString(String str) {
     return Uint8List.fromList(utf8.encode('${str.length}:$str'));
+  }
+
+  Uint8List _encodeStringInUint8List(Uint8List str) {
+    List<int> result = [];
+    result.addAll(utf8.encode('${str.length}:'));
+    result.addAll(str);
+    return Uint8List.fromList(result);
   }
 
   Uint8List _encodeList(List list) {
