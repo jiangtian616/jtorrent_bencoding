@@ -143,7 +143,8 @@ class _BDecoder {
     return _decodeIntegerFromPosition(startPosition, endPosition);
   }
 
-  Uint8List _decodeString() {
+  /// Decode to utf-8 string if possible, otherwise return Uint8List
+  dynamic _decodeString() {
     int lengthStartPosition = _position;
     int lengthEndPosition = _findNextChar(colonChar);
     int length = _decodeIntegerFromPosition(lengthStartPosition, lengthEndPosition);
@@ -152,7 +153,13 @@ class _BDecoder {
     int strEndPosition = strStartPosition + length;
 
     _position = strEndPosition;
-    return _data.sublist(strStartPosition, strEndPosition);
+
+    Uint8List uint8list = _data.sublist(strStartPosition, strEndPosition);
+    try {
+      return utf8.decode(uint8list);
+    } catch (e) {
+      return uint8list;
+    }
   }
 
   List _decodeList() {
@@ -172,14 +179,8 @@ class _BDecoder {
 
     Map<String, dynamic> map = {};
     while (_data[_position] != eChar) {
-      Uint8List key = _decodeString();
-      String keyString;
-      try {
-        keyString = utf8.decode(key);
-      } catch (e) {
-        keyString = String.fromCharCodes(key);
-      }
-      map[keyString] = decode();
+      dynamic key = _decodeString();
+      map[key is String ? key : String.fromCharCodes(key)] = decode();
     }
 
     _position++;

@@ -83,30 +83,30 @@ void main() {
     });
 
     test('Test string JTorrent', () {
-      assert(ListEquality().equals(
+      assert(Equality().equals(
         bDecode(Utf8Codec().encoder.convert('8:JTorrent')),
-        'JTorrent'.codeUnits,
+        'JTorrent',
       ));
     });
 
     test('Test string 127.0.0.1', () {
-      assert(ListEquality().equals(
+      assert(Equality().equals(
         bDecode(Utf8Codec().encoder.convert('9:127.0.0.1')),
-        '127.0.0.1'.codeUnits,
+        '127.0.0.1',
       ));
     });
 
     test('Test string localhost:80', () {
-      assert(ListEquality().equals(
+      assert(Equality().equals(
         bDecode(Utf8Codec().encoder.convert('12:localhost:80')),
-        'localhost:80'.codeUnits,
+        'localhost:80',
       ));
     });
 
     test('Test list', () {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666ee')),
-        ['JTorrent'.codeUnits, 666],
+        ['JTorrent', 666],
       ));
     });
 
@@ -114,9 +114,9 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666el8:JTorrenti666eee')),
         [
-          'JTorrent'.codeUnits,
+          'JTorrent',
           666,
-          ['JTorrent'.codeUnits, 666],
+          ['JTorrent', 666],
         ],
       ));
     });
@@ -146,11 +146,11 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('d5:2name9:2JTorrent4:name8:JTorrent5:piecei5e4:listld4:name8:JTorrenteee')),
         {
-          '2name': '2JTorrent'.codeUnits,
-          'name': 'JTorrent'.codeUnits,
+          '2name': '2JTorrent',
+          'name': 'JTorrent',
           'piece': 5,
           'list': [
-            {'name': 'JTorrent'.codeUnits}
+            {'name': 'JTorrent'}
           ]
         },
       ));
@@ -161,7 +161,7 @@ void main() {
         bDecode(Utf8Codec().encoder.convert('li666ed4:name8:JTorrentee')),
         [
           666,
-          {'name': 'JTorrent'.codeUnits}
+          {'name': 'JTorrent'}
         ],
       ));
     });
