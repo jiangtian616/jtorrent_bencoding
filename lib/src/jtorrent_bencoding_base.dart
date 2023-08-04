@@ -5,12 +5,12 @@ import '../jtorrent_bencoding.dart';
 
 /// http://bittorrent.org/beps/bep_0003.html
 
-/// Encode num/String/bool/List/Map to Uint8List
+/// Encode int/String/bool/List/Map to Uint8List
 Uint8List bEncode(dynamic data) {
   return _BEncoder(data).encode();
 }
 
-/// Decode Uint8List to num/String/bool/List/Map/null
+/// Decode Uint8List to int/Uint8List(String)/List/Map/null
 dynamic bDecode(Uint8List data) {
   if (data.isEmpty) {
     return null;
