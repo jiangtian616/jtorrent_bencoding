@@ -143,8 +143,8 @@ class _BDecoder {
     return _decodeIntegerFromPosition(startPosition, endPosition);
   }
 
-  /// Decode to utf-8 string if possible, otherwise return Uint8List
-  dynamic _decodeString() {
+  /// Decode to utf-8 string if possible, otherwise return String.fromCharCodes(uint8list)
+  String _decodeString() {
     int lengthStartPosition = _position;
     int lengthEndPosition = _findNextChar(colonChar);
     int length = _decodeIntegerFromPosition(lengthStartPosition, lengthEndPosition);
@@ -158,7 +158,7 @@ class _BDecoder {
     try {
       return utf8.decode(uint8list);
     } catch (e) {
-      return uint8list;
+      return String.fromCharCodes(uint8list);
     }
   }
 
