@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:jtorrent_bencoding/src/jtorrent_bencoding_base.dart';
@@ -32,6 +33,10 @@ void main() {
 
     test('Encode string JTorrent', () {
       assert(utf8.decode(bEncode('JTorrent')) == '8:JTorrent');
+    });
+
+    test('Encode string ab in UInt8List', () {
+      assert(ListEquality().equals(bEncode(utf8.encode('ab')), Uint8List.fromList([50, 58, 97, 98])));
     });
 
     test('Encode empty list', () {
@@ -83,30 +88,34 @@ void main() {
     });
 
     test('Test string JTorrent', () {
-      assert(Equality().equals(
+      assert(ListEquality().equals(
         bDecode(Utf8Codec().encoder.convert('8:JTorrent')),
-        'JTorrent',
+        utf8.encode('JTorrent'),
       ));
     });
 
     test('Test string 127.0.0.1', () {
-      assert(Equality().equals(
+      assert(ListEquality().equals(
         bDecode(Utf8Codec().encoder.convert('9:127.0.0.1')),
-        '127.0.0.1',
+        utf8.encode('127.0.0.1'),
       ));
     });
 
     test('Test string localhost:80', () {
-      assert(Equality().equals(
+      assert(ListEquality().equals(
         bDecode(Utf8Codec().encoder.convert('12:localhost:80')),
-        'localhost:80',
+        utf8.encode('localhost:80'),
       ));
+    });
+
+    test('Test string ab in UInt8List', () {
+      assert(ListEquality().equals(bDecode(bEncode(utf8.encode('ab'))), utf8.encode('ab')));
     });
 
     test('Test list', () {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666ee')),
-        ['JTorrent', 666],
+        [utf8.encode('JTorrent'), 666],
       ));
     });
 
@@ -114,9 +123,9 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('l8:JTorrenti666el8:JTorrenti666eee')),
         [
-          'JTorrent',
+          utf8.encode('JTorrent'),
           666,
-          ['JTorrent', 666],
+          [utf8.encode('JTorrent'), 666],
         ],
       ));
     });
@@ -146,11 +155,11 @@ void main() {
       assert(DeepCollectionEquality().equals(
         bDecode(Utf8Codec().encoder.convert('d5:2name9:2JTorrent4:name8:JTorrent5:piecei5e4:listld4:name8:JTorrenteee')),
         {
-          '2name': '2JTorrent',
-          'name': 'JTorrent',
+          '2name': utf8.encode('2JTorrent'),
+          'name': utf8.encode('JTorrent'),
           'piece': 5,
           'list': [
-            {'name': 'JTorrent'}
+            {'name': utf8.encode('JTorrent')}
           ]
         },
       ));
@@ -161,7 +170,7 @@ void main() {
         bDecode(Utf8Codec().encoder.convert('li666ed4:name8:JTorrentee')),
         [
           666,
-          {'name': 'JTorrent'}
+          {'name': utf8.encode('JTorrent')}
         ],
       ));
     });

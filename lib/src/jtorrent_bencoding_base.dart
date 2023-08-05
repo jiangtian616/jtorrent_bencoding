@@ -11,11 +11,11 @@ Uint8List bEncode(dynamic data) {
 }
 
 /// Decode Uint8List to int/Uint8List(String)/List/Map/null
-dynamic bDecode(Uint8List data) {
+dynamic bDecode(Uint8List data, {Encoding keyEncoding = utf8}) {
   if (data.isEmpty) {
     return null;
   }
-  return _BDecoder(data).decode();
+  return _BDecoder(data, keyEncoding).decode();
 }
 
 class _BEncoder {
@@ -25,6 +25,7 @@ class _BEncoder {
   final Uint8List buffE = Uint8List.fromList(utf8.encode('e'));
   final Uint8List buffL = Uint8List.fromList(utf8.encode('l'));
   final Uint8List buffD = Uint8List.fromList(utf8.encode('d'));
+  final Uint8List buffColon = Uint8List.fromList(utf8.encode(':'));
 
   _BEncoder(this._data);
 
@@ -64,7 +65,7 @@ class _BEncoder {
   }
 
   Uint8List _encodeString(String str) {
-    return Uint8List.fromList(utf8.encode('${str.length}:$str'));
+    return _encodeStringInUint8List(Uint8List.fromList(utf8.encode(str)));
   }
 
   Uint8List _encodeStringInUint8List(Uint8List str) {
@@ -115,9 +116,11 @@ class _BDecoder {
   static const int colonChar = 0x3A;
 
   final Uint8List _data;
+  final Encoding _keyEncoding;
+
   int _position = 0;
 
-  _BDecoder(this._data);
+  _BDecoder(this._data, this._keyEncoding);
 
   dynamic decode() {
     if (_data.isEmpty) {
@@ -143,8 +146,8 @@ class _BDecoder {
     return _decodeIntegerFromPosition(startPosition, endPosition);
   }
 
-  /// Decode to utf-8 string if possible, otherwise return String.fromCharCodes(uint8list)
-  String _decodeString() {
+  /// Decode to Uint8List only
+  Uint8List _decodeString() {
     int lengthStartPosition = _position;
     int lengthEndPosition = _findNextChar(colonChar);
     int length = _decodeIntegerFromPosition(lengthStartPosition, lengthEndPosition);
@@ -154,12 +157,7 @@ class _BDecoder {
 
     _position = strEndPosition;
 
-    Uint8List uint8list = _data.sublist(strStartPosition, strEndPosition);
-    try {
-      return utf8.decode(uint8list);
-    } catch (e) {
-      return String.fromCharCodes(uint8list);
-    }
+    return _data.sublist(strStartPosition, strEndPosition);
   }
 
   List _decodeList() {
@@ -179,8 +177,16 @@ class _BDecoder {
 
     Map<String, dynamic> map = {};
     while (_data[_position] != eChar) {
-      dynamic key = _decodeString();
-      map[key is String ? key : String.fromCharCodes(key)] = decode();
+      Uint8List key = _decodeString();
+      
+      String keyStr;
+      try {
+        keyStr = _keyEncoding.decode(key);
+      } catch (_) {
+        throw BDecodingException('BDecode failed, invalid key: "$key"');
+      }
+      
+      map[keyStr] = decode();
     }
 
     _position++;

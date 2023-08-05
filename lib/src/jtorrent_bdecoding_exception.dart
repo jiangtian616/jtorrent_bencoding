@@ -5,6 +5,6 @@ class BDecodingException implements Exception {
 
   @override
   String toString() {
-    return "BEncodingException: $message";
+    return "BDecodingException: $message";
   }
 }
